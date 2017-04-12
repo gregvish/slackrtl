@@ -12,10 +12,10 @@
 
 function should_input_be_rtl(element)
 {
-    if (typeof element.value != "string") {
+    if (typeof element.innerText != "string") {
         return false;
     }
-    return null !== element.value.match(/^[\s\d"']*[א-ת]+/);
+    return null !== element.innerText.match(/^[\s\d"']*[א-ת]+/);
 }
 
 function should_message_be_rtl(element)
@@ -64,8 +64,10 @@ document.getElementById("msg_input").addEventListener("keyup", function(event) {
     var target = event.target;
     if (should_input_be_rtl(target)) {
         target.style.setProperty("direction", "rtl");
+        target.style.setProperty("text-align", "right");
         fix_all_emojis(target);
     } else {
         target.style.setProperty("direction", "ltr");
+        target.style.setProperty("text-align", "left");
     }
 });
