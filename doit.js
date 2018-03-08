@@ -23,7 +23,7 @@ function should_message_be_rtl(element)
     if (typeof element.innerText != "string") {
         return false;
     }
-    return null !== element.innerText.match(/\n[\s\d"']*[א-ת]+/);
+    return null !== element.innerText.match(/^[\s\d"']*[א-ת]+/);
 }
 
 function fix_all_emojis(element)
@@ -36,29 +36,29 @@ function fix_all_emojis(element)
     }
 }
 
-var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-        for (var i = 0; i < mutation.addedNodes.length; i++) {
-            var added = mutation.addedNodes[i];
-            var targets = [];
+function do_mod()
+{
+    var targets = document.getElementsByClassName("c-message__body");
 
-            if (added.nodeName == 'TS-MESSAGE') {
-                targets = [added];
-            } else if (typeof added.getElementsByTagName == "function") {
-                targets = added.getElementsByTagName("TS-MESSAGE");
-            }
+    for (var j = 0; j < targets.length; j++) {
+        var element = targets[j];
 
-            for (var j = 0; j < targets.length; j++) {
-                var element = targets[j];
-                if (should_message_be_rtl(element)) {
-                    element.style.setProperty("direction", "rtl");
-                    fix_all_emojis(element);
-                }
-            }
+        if (should_message_be_rtl(element)) {
+            element.parentNode.style.setProperty("direction", "rtl");
+            fix_all_emojis(element);
         }
-    });
+    }
+}
+
+var observer = new MutationObserver(function(mutations) {
+    do_mod();
 });
-observer.observe(document.getElementById("msgs_div"), { childList: true, subtree: true });
+
+window.setTimeout(function() {
+    observer.observe(document.getElementsByClassName("p-message_pane")[0], { childList: true, subtree: true });
+    window.console.log("Observer installed");
+    do_mod();
+}, 1000);
 
 document.getElementById("msg_input").addEventListener("keyup", function(event) {
     var target = event.target;
